@@ -36,7 +36,7 @@ export function Desk({
 }) {
   const production = company.productions[0];
   const date = selectedDate || board.date || draft?.performanceDate || "";
-  const roleId = selectedRoleId || "role.rosa";
+  const roleId = selectedRoleId || "role-rosa";
   const role = getDoc<RoleDoc>(company, roleId);
   const workingSheet =
     (date ? currentPostedCallSheet(company.callSheets, date) : null) ??

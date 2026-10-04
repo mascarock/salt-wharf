@@ -42,7 +42,7 @@ export const structure: StructureResolver = (S) =>
             .title("The Last Luzzu")
             .items([
               S.documentListItem()
-                .id("production.lastLuzzu")
+                .id("production-lastLuzzu")
                 .schemaType("production")
                 .title("Production"),
               S.listItem()
@@ -51,7 +51,7 @@ export const structure: StructureResolver = (S) =>
                   S.documentList()
                     .title("Scenes")
                     .filter(
-                      '_type == "scene" && production._ref == "production.lastLuzzu"',
+                      '_type == "scene" && production._ref == "production-lastLuzzu"',
                     )
                     .defaultOrdering([{ field: "order", direction: "asc" }]),
                 ),
@@ -61,7 +61,7 @@ export const structure: StructureResolver = (S) =>
                   S.documentList()
                     .title("Roles")
                     .filter(
-                      '_type == "role" && production._ref == "production.lastLuzzu"',
+                      '_type == "role" && production._ref == "production-lastLuzzu"',
                     ),
                 ),
               S.listItem()

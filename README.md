@@ -37,8 +37,8 @@ It prints the posted sheet for that date that no other **posted** sheet for the 
 
 In the seed, 4 October 2026 has two posted sheets:
 
-1. `callSheet.oct4.v1` still names Mara Camilleri as Rosa.
-2. `callSheet.oct4.v2` sets `supersedes` to the first sheet and names Lina Borg, because Camilleri is unavailable.
+1. `callSheet-oct4-v1` still names Mara Camilleri as Rosa.
+2. `callSheet-oct4-v2` sets `supersedes` to the first sheet and names Lina Borg, because Camilleri is unavailable.
 
 The door shows Borg. The first sheet is still in the dataset, still `posted`, and still wrong if you read it in isolation.
 
