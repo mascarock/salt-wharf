@@ -59,7 +59,7 @@ Sanity Workflows (the product) is a different thing from workflow-as-data. I mod
 
 1. Open `/` (deployed as `saltwharf.vibefy.net`). Lina Borg is Rosa. The slip says why: a later sheet replaced Mara Camilleri. Camilleri is not called. Under the calls, the book keeps the earlier sheet, marked replaced. The footer names the Sanity project, `ebwymj6z`, and dataset, `production`.
 2. Sign in at `/backstage` as `elena` / `callboard`. This is a fake contest gate, not real security.
-3. Cover finder, role Rosa, night 4 October. Borg can cover. Vella fails range. Galea fails concurrent scene. Camilleri fails date. Micallef fails already covering. Azzopardi fails skill.
+3. Cover finder, role Rosa, night 4 October. Borg can cover. Vella fails range. Galea fails concurrent scene. Camilleri is unavailable. Micallef fails already covering. Azzopardi fails skill.
 4. Advance the 5 October draft. Each button writes a `workflowTransition` and changes status. Posting it does not disturb 4 October, because supersedes is per date. The moves live in your browser only.
 5. `npm run verify` asserts (1) and (3) against the seed file.
 

@@ -25,8 +25,8 @@ export default async function BackstagePage({
           </h1>
           <p className="relative mt-4 text-sm text-[var(--ink-soft)]">
             Fake contest gate, not real security. It is printed here on
-            purpose for the challenge judges and protects nothing in Sanity or
-            GitHub. Stage manager name <strong>elena</strong>, passphrase{" "}
+            purpose for the challenge judges. Stage manager name{" "}
+            <strong>elena</strong>, passphrase{" "}
             <strong>callboard</strong>.
           </p>
           <div className="relative mt-8">

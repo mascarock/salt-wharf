@@ -25,7 +25,7 @@ The fake stage-door credentials are intentionally printed for the challenge demo
 - name: `elena`
 - passphrase: `callboard`
 
-They are fake. They do not protect Sanity, GitHub, or any real system. Live Sanity writes still require the normal local environment configuration and a real write token. The repo keeps `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` empty.
+They are fake and only exist for the challenge demo. Live Sanity writes still require the normal local environment configuration and a real write token. The repo keeps `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` empty.
 
 Sanity project id: `ebwymj6z`
 

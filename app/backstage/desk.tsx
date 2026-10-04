@@ -79,10 +79,9 @@ export function Desk({
           </form>
         </div>
         <p className="relative mt-3 max-w-xl text-sm text-[var(--ink-soft)]">
-          Fake contest gate, not real security. It does not protect Sanity or
-          GitHub; live writes still require local Sanity environment
-          credentials. Moves write a transition document instead of flipping a
-          boolean.
+          Fake contest gate, not real security. It is disclosed for the
+          challenge judges. Moves write a transition document instead of
+          flipping a boolean.
         </p>
         {fixtureMode ? (
           <div className="relative mt-3 flex flex-wrap items-center gap-3">
@@ -515,7 +514,7 @@ function CoverageList({ traces }: { traces: CoverTrace[] }) {
             >
               <span>{trace.personName}</span>
               <span className="font-mono text-[0.7rem] uppercase text-[var(--pin)]">
-                {trace.failedPredicate}
+                {formatFailure(trace.failedPredicate)}
               </span>
             </li>
           ))}
@@ -523,4 +522,8 @@ function CoverageList({ traces }: { traces: CoverTrace[] }) {
       </div>
     </div>
   );
+}
+
+function formatFailure(reason: CoverTrace["failedPredicate"]) {
+  return reason === "date" ? "unavailable" : reason;
 }

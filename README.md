@@ -35,7 +35,7 @@ The backstage gate is a fake contest gate, not real security. It is intentionall
 - Name: `elena`
 - Passphrase: `callboard`
 
-This does not protect Sanity, GitHub, or any real resource. Live Sanity writes require the normal local Sanity environment setup, including a write token. The repo leaves `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` empty.
+It is only a disclosed route for the challenge demo. Live Sanity writes require the normal local Sanity environment setup, including a write token. The repo leaves `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` empty.
 
 `/` is the public door. `/backstage` is the desk. `/studio` mounts Sanity Studio only when fixture mode is off.
 
