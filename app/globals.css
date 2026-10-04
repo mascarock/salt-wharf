@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+:root {
+  --corridor: #1b140d;
+  --corridor-edge: #2a1c12;
+  --paper: #f3e6c4;
+  --paper-deep: #e8d4a8;
+  --ink: #22170f;
+  --ink-soft: #6a5340;
+  --rule: #c4a36a;
+  --tungsten: #d4a04a;
+  --tungsten-glow: rgba(212, 160, 74, 0.28);
+  --pin: #8b3a2a;
+  --background: var(--corridor);
+  --foreground: var(--paper);
+  --font-sans: var(--font-display);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-rule: var(--rule);
+  --color-tungsten: var(--tungsten);
+  --font-sans: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, var(--tungsten-glow), transparent 42%),
+    linear-gradient(180deg, #24180f 0%, var(--corridor) 38%, #120d09 100%);
+  color: var(--paper);
+  font-family: var(--font-display), "Times New Roman", serif;
+}
+
+a {
+  color: inherit;
+}
+
+.font-display {
+  font-family: var(--font-display), "Times New Roman", serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--tungsten);
+  color: var(--ink);
+}
+
+.paper-board {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(180deg, rgba(255, 244, 214, 0.45), transparent 22%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 31px,
+      rgba(36, 24, 15, 0.035) 32px
+    );
+  color: var(--ink);
+  box-shadow:
+    0 0 0 1px rgba(36, 24, 15, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 80px rgba(139, 58, 42, 0.05);
+}
+
+.paper-board::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(196, 163, 106, 0.45);
+  pointer-events: none;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .paper-board {
+    box-shadow: none;
+  }
+}
