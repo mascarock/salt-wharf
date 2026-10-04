@@ -78,3 +78,16 @@ export function formatBoardDate(isoDate: string): string {
     timeZone: "UTC",
   }).format(date);
 }
+
+export function formatPostedTime(isoDateTime: string): string {
+  const date = new Date(isoDateTime);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  const time = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(date);
+  return `${time} UTC`;
+}

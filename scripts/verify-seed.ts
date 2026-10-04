@@ -76,8 +76,31 @@ async function main() {
     "public door does not show Camilleri after v2 posts",
   );
 
+  assert.equal(board.replacements[0].currentSheetTitle, "4 Oct — Rosa cover");
+  assert.deepEqual(
+    board.book.map((entry) => ({
+      sheetId: entry.sheetId,
+      state: entry.state,
+      calls: entry.calls,
+    })),
+    [
+      {
+        sheetId: "callSheet-oct4-v2",
+        state: "standing",
+        calls: [{ roleName: "Rosa", personName: "Lina Borg" }],
+      },
+      {
+        sheetId: "callSheet-oct4-v1",
+        state: "replaced",
+        calls: [{ roleName: "Rosa", personName: "Mara Camilleri" }],
+      },
+    ],
+    "the door's book keeps v1, marked replaced by v2",
+  );
+  assert.equal(board.book[1].replacedBy, "4 Oct — Rosa cover");
+
   console.log(
-    "Seed story holds: v1 still names Mara Camilleri; v2 supersedes it; the public door calls Lina Borg.",
+    "Seed story holds: v1 still names Mara Camilleri; v2 supersedes it; the public door calls Lina Borg and keeps v1 in the book, marked replaced.",
   );
 }
 

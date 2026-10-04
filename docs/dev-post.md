@@ -6,7 +6,7 @@ tags: sanitychallenge
 
 I built Salt Wharf as a stage-door callboard for a fictional Valletta theatre company. The public page is meant to feel like the sheet taped beside the stage door, not an admin dashboard: it answers one question for tonight, which is who is actually called.
 
-The story in the data happens on 4 October 2026. There are two posted call sheets for that night. The first one still names Mara Camilleri as Rosa. The second one supersedes the first and posts Lina Borg because Camilleri is off. The public door shows Borg, while backstage still shows that the earlier posted sheet exists and does not win.
+The story in the data happens on 4 October 2026. There are two posted call sheets for that night. The first one still names Mara Camilleri as Rosa. The second one supersedes the first and posts Lina Borg because Camilleri is off. The public door shows Borg and says why: a later sheet replaced Camilleri. The earlier posted sheet stays in the door's book, marked replaced, and backstage shows the whole stack.
 
 That was the Sanity-shaped part I wanted to make visible. I did not want to overwrite history just to get the correct door. The model keeps both sheets as documents. The later posted sheet points at the earlier one with `supersedes`, and the resolver prints the posted sheet for that date that no other posted sheet supersedes.
 

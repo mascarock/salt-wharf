@@ -26,7 +26,9 @@ I did not add a `cover` document type. The later call sheet may annotate an item
 
 ## Fixture mode
 
-The app still runs with no env vars. `SANITY_PROJECT_ID` unset means `sanity/seed.ndjson` is the dataset. Stage-manager writes go to `.data/overlay.ndjson`, merged by `_id`. That overlay is gitignored. Restarting without the overlay restores the committed story.
+The app still runs with no env vars. `SANITY_PROJECT_ID` unset means `sanity/seed.ndjson` is the dataset. The seed is imported as a string at build time (a webpack `asset/source` rule in `next.config.ts`), so the server never reads the filesystem. That is what lets the same build run on Cloudflare Workers.
+
+Stage-manager moves are kept in the visitor's own cookie as a short list of transitions and replayed onto the seed, with the same legality check as the server action. Nothing is shared between visitors. One judge posting the 5 October draft cannot change another judge's door, and **Put the book back** on the desk restores the committed story.
 
 The Sanity project is `ebwymj6z`, dataset `production`, organization `mascarock` (`o1r4ucepz`). Context Knowledge Bases is enabled on the org. Tokens are not in the repo. When `SANITY_PROJECT_ID` and a write token are set locally, the same document shapes are fetched with GROQ and transitions are written through the API.
 
@@ -41,7 +43,7 @@ What I did ship, and what actually runs after an import:
 - a custom structure: call sheets by status, the production graph, company, transition log
 - a Callboard Studio tool that resolves the standing posted sheet with the same function as `/`
 
-`/studio` in fixture mode does not boot Studio against a missing env. It says the studio is parked and how to mount it.
+`/studio` in fixture mode does not boot Studio against a missing env. It says the studio is parked and how to mount it. When it does mount, Studio loads in the browser only (`next/dynamic` with `ssr: false`). Server-rendering it put about 9 MB of Studio into the Cloudflare worker. Without it, the upload is about 1.1 MB gzipped.
 
 Sanity Workflows (the product) is a different thing from workflow-as-data. I modelled the process as documents next to the content, which is what the desk and an agent can share. I did not take a dependency on a prerelease workflow engine.
 
@@ -55,10 +57,10 @@ Sanity Workflows (the product) is a different thing from workflow-as-data. I mod
 
 ## How to judge the story quickly
 
-1. Open `/`. Lina Borg is Rosa. Mara Camilleri is not on the board.
-2. Sign in at `/backstage` as `elena` / `callboard`.
+1. Open `/` (deployed as `saltwharf.vibefy.net`). Lina Borg is Rosa. The slip says why: a later sheet replaced Mara Camilleri. Camilleri is not called. Under the calls, the book keeps the earlier sheet, marked replaced. The footer names the Sanity project, `ebwymj6z`, and dataset, `production`.
+2. Sign in at `/backstage` as `elena` / `callboard`. This is a fake contest gate, not real security.
 3. Cover finder, role Rosa, night 4 October. Borg can cover. Vella fails range. Galea fails concurrent scene. Camilleri fails date. Micallef fails already covering. Azzopardi fails skill.
-4. Advance the 5 October draft. Each button writes a `workflowTransition` and changes status. Posting it does not disturb 4 October, because supersedes is per date.
+4. Advance the 5 October draft. Each button writes a `workflowTransition` and changes status. Posting it does not disturb 4 October, because supersedes is per date. The moves live in your browser only.
 5. `npm run verify` asserts (1) and (3) against the seed file.
 
 ## Taste

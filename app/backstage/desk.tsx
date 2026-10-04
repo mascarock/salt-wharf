@@ -18,7 +18,7 @@ import type {
   WorkflowTransitionDoc,
 } from "@/lib/types";
 import { NEXT_STATUSES, STATUS_LABELS } from "@/lib/workflow";
-import { logoutAction } from "./actions";
+import { logoutAction, resetBookAction } from "./actions";
 import { TransitionForm } from "./transition-form";
 
 export function Desk({
@@ -27,12 +27,14 @@ export function Desk({
   draft,
   selectedRoleId,
   selectedDate,
+  fixtureMode,
 }: {
   company: Company;
   board: BoardView;
   draft: CallSheetDoc | null;
   selectedRoleId?: string;
   selectedDate?: string;
+  fixtureMode: boolean;
 }) {
   const production = company.productions[0];
   const date = selectedDate || board.date || draft?.performanceDate || "";
@@ -77,11 +79,24 @@ export function Desk({
           </form>
         </div>
         <p className="relative mt-3 max-w-xl text-sm text-[var(--ink-soft)]">
-          Fake stage-door gate for the challenge demo. It does not protect
-          Sanity or GitHub; live writes still require local Sanity environment
+          Fake contest gate, not real security. It does not protect Sanity or
+          GitHub; live writes still require local Sanity environment
           credentials. Moves write a transition document instead of flipping a
           boolean.
         </p>
+        {fixtureMode ? (
+          <div className="relative mt-3 flex flex-wrap items-center gap-3">
+            <p className="max-w-md text-sm text-[var(--ink-soft)]">
+              Fixture mode: your moves are kept in this browser only. Nobody
+              else sees them on the door.
+            </p>
+            <form action={resetBookAction}>
+              <Button type="submit" variant="outline" size="sm">
+                Put the book back
+              </Button>
+            </form>
+          </div>
+        ) : null}
 
         <Separator className="relative my-6" />
 
@@ -284,7 +299,7 @@ function PostedSheetStack({
               {isReplaced && standingSheet ? (
                 <p className="mt-2 text-sm text-[var(--pin)]">
                   Still says posted, but {standingSheet.title ?? standingSheet._id}{" "}
-                  supersedes it, so Mara Camilleri does not appear on the door.
+                  supersedes it, so its calls no longer stand on the door.
                 </p>
               ) : null}
               <ul className="mt-3 space-y-1">

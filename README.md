@@ -9,6 +9,8 @@ On 4 October 2026, two posted sheets exist:
 
 The door shows Borg. The earlier sheet is still in the dataset and still says `posted`, but it does not win because a later posted sheet for the same night points at it with `supersedes`.
 
+The door says it in words: tonight's Rosa is Lina Borg because a later sheet replaced Mara Camilleri. Under the calls, the door's book keeps both sheets for the night: the later one on the door, the earlier one marked replaced.
+
 ## Run
 
 ```bash
@@ -16,7 +18,7 @@ npm install
 npm run dev
 ```
 
-Open [http://127.0.0.1:43174](http://127.0.0.1:43174). No environment variables are required. With `SANITY_PROJECT_ID` unset, fixture mode reads `sanity/seed.ndjson` and local workflow moves write to `.data/overlay.ndjson`, which is gitignored.
+Open [http://127.0.0.1:43174](http://127.0.0.1:43174). No environment variables are required. With `SANITY_PROJECT_ID` unset, fixture mode reads `sanity/seed.ndjson`, which is bundled into the build, so nothing reads the filesystem at runtime. Stage-manager moves are kept in a cookie in your own browser (`sw_moves`, 12 hours) and replayed onto the seed. Other visitors keep seeing the committed story. **Put the book back** on the desk clears your moves.
 
 ```bash
 npm run verify
@@ -28,7 +30,7 @@ npm start
 
 ## Stage Door
 
-The backstage gate is fake stage-door theatre for the challenge demo. It is intentionally disclosed:
+The backstage gate is a fake contest gate, not real security. It is intentionally disclosed for the challenge judges:
 
 - Name: `elena`
 - Passphrase: `callboard`
@@ -82,6 +84,18 @@ npx sanity dataset import sanity/seed.ndjson production
 
 Schema lives under `sanity/schema`. The Sanity desk structure groups call sheets by status and exposes a Callboard tool that resolves the same standing posted sheet as the public door.
 
+## Cloudflare Workers
+
+The public site runs on Cloudflare Workers through [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare): Worker `salt-wharf`, custom domain `saltwharf.vibefy.net` (see `wrangler.jsonc`). It runs in fixture mode and needs no secrets or bindings. Leave `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` unset there too.
+
+```bash
+npx opennextjs-cloudflare build    # next build --webpack, then .open-next/worker.js + .open-next/assets
+npx opennextjs-cloudflare preview  # serve that bundle locally in workerd
+npx opennextjs-cloudflare deploy   # upload it (needs CLOUDFLARE_API_TOKEN or wrangler login)
+```
+
+`npm run deploy` builds and uploads in one go. `/studio` loads Sanity Studio in the browser only, which keeps the Studio out of the worker bundle.
+
 ## Scripts
 
 | Command | What it does |
@@ -91,3 +105,5 @@ Schema lives under `sanity/schema`. The Sanity desk structure groups call sheets
 | `npm run build` | Verifies the seed, then builds the Next app |
 | `npm run start` | Starts the built app on port 43174 |
 | `npm run seed:write` | Rewrites `sanity/seed.ndjson` from `scripts/generate-seed.ts` |
+| `npm run preview` | Builds the Cloudflare worker and serves it locally in workerd |
+| `npm run deploy` | Builds the Cloudflare worker and uploads it to `salt-wharf` |

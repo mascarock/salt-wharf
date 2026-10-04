@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { clearFixtureMoves } from "@/lib/fixtures";
 import { applyWorkflowTransition } from "@/lib/mutations";
 import {
   STAGE_MANAGER_DISPLAY,
+  isStageManager,
   signInStageManager,
   signOutStageManager,
 } from "@/lib/session";
@@ -28,7 +30,16 @@ export async function logoutAction() {
   revalidatePath("/backstage");
 }
 
+export async function resetBookAction() {
+  await clearFixtureMoves();
+  revalidatePath("/");
+  revalidatePath("/backstage");
+}
+
 export async function transitionAction(formData: FormData) {
+  if (!(await isStageManager())) {
+    return { error: "The book is shut. Sign in at the stage door first." };
+  }
   const callSheetId = String(formData.get("callSheetId") ?? "");
   const toStatus = String(formData.get("toStatus") ?? "") as CallSheetStatus;
   const note = String(formData.get("note") ?? "");

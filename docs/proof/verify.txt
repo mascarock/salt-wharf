@@ -2,4 +2,4 @@
 > salt-wharf@0.1.0 verify
 > tsx scripts/verify-seed.ts
 
-Seed story holds: v1 still names Mara Camilleri; v2 supersedes it; the public door calls Lina Borg.
+Seed story holds: v1 still names Mara Camilleri; v2 supersedes it; the public door calls Lina Borg and keeps v1 in the book, marked replaced.

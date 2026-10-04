@@ -1,10 +1,18 @@
 import { isFixtureMode } from "@/lib/env";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { StudioMount } from "../studio-mount";
 
 export const dynamic = "force-dynamic";
 
-export { metadata, viewport } from "next-sanity/studio";
+// The values next-sanity/studio exports. Re-exporting them from that entry
+// would pull the whole Studio into the server bundle.
+export const metadata: Metadata = { referrer: "same-origin", robots: "noindex" };
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function StudioPage() {
   if (isFixtureMode()) {

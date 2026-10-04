@@ -18,10 +18,22 @@ export type BoardLine = {
 
 export type BoardReplacement = {
   roleName: string;
+  roleId: string;
   previousPersonName: string;
   currentPersonName: string;
   previousSheetTitle: string;
   previousSheetId: string;
+  currentSheetTitle: string;
+};
+
+/** A posted sheet for the night, as the book keeps it. */
+export type BookEntry = {
+  sheetId: string;
+  title: string;
+  state: "standing" | "replaced" | "posted";
+  postedAt: string | null;
+  replacedBy?: string;
+  calls: { roleName: string; personName: string }[];
 };
 
 export type BoardView = {
@@ -32,6 +44,7 @@ export type BoardView = {
   production: ProductionDoc | null;
   lines: BoardLine[];
   replacements: BoardReplacement[];
+  book: BookEntry[];
   emptyReason: "none" | "unposted" | "ok";
 };
 
@@ -55,6 +68,7 @@ export function buildBoardView(
       production,
       lines: [],
       replacements: [],
+      book: [],
       emptyReason: "unposted",
     };
   }
@@ -88,8 +102,68 @@ export function buildBoardView(
     production,
     lines,
     replacements,
+    book: buildBook(company, date, sheet, replacements),
     emptyReason: "ok",
   };
+}
+
+/**
+ * Every posted sheet for the night stays in the book. The standing sheet is
+ * on the door; a sheet another posted sheet supersedes is marked replaced.
+ * Each entry lists who it calls for the roles that changed.
+ */
+function buildBook(
+  company: Company,
+  date: string,
+  standing: CallSheetDoc,
+  replacements: BoardReplacement[],
+): BookEntry[] {
+  const changedRoles = new Set(replacements.map((change) => change.roleId));
+  const posted = company.callSheets.filter(
+    (sheet) => sheet.performanceDate === date && sheet.status === "posted",
+  );
+
+  return posted
+    .map((sheet): BookEntry => {
+      const replacedBy = posted.find(
+        (other) => other.supersedes?._ref === sheet._id,
+      );
+      return {
+        sheetId: sheet._id,
+        title: sheet.title ?? sheet._id,
+        state:
+          sheet._id === standing._id
+            ? "standing"
+            : replacedBy
+              ? "replaced"
+              : "posted",
+        postedAt: lastPostedAt(company, sheet._id),
+        replacedBy: replacedBy ? (replacedBy.title ?? replacedBy._id) : undefined,
+        calls: sheet.items
+          .filter((item) => changedRoles.has(item.role._ref))
+          .map((item) => ({
+            roleName:
+              getDoc<RoleDoc>(company, item.role._ref)?.characterName ?? "Role",
+            personName:
+              getDoc<PersonDoc>(company, item.person._ref)?.name ?? "Unnamed",
+          })),
+      };
+    })
+    .sort((a, b) => {
+      if (a.state === "standing") return -1;
+      if (b.state === "standing") return 1;
+      return (b.postedAt ?? "").localeCompare(a.postedAt ?? "");
+    });
+}
+
+function lastPostedAt(company: Company, sheetId: string): string | null {
+  const times = company.transitions
+    .filter(
+      (move) => move.callSheet._ref === sheetId && move.toStatus === "posted",
+    )
+    .map((move) => move.at)
+    .sort();
+  return times.at(-1) ?? null;
 }
 
 function buildReplacements(
@@ -121,10 +195,12 @@ function buildReplacements(
 
       return {
         roleName: role?.characterName ?? "Role",
+        roleId: item.role._ref,
         previousPersonName: previousPerson?.name ?? "Previous call",
         currentPersonName: currentPerson?.name ?? "Current call",
         previousSheetTitle: previous.title ?? previous._id,
         previousSheetId: previous._id,
+        currentSheetTitle: sheet.title ?? sheet._id,
       };
     })
     .filter((item): item is BoardReplacement => Boolean(item));

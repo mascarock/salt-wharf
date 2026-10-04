@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getDoc, type Company } from "./company";
 import { isFixtureMode } from "./env";
-import { upsertFixtureDocuments } from "./fixtures";
+import { recordFixtureMove } from "./fixtures";
 import { loadCompany } from "./load-company";
 import { createSanityClient } from "./sanity-client";
 import type {
@@ -43,14 +43,9 @@ export async function applyWorkflowTransition(
     at,
     note: input.note?.trim() || undefined,
   };
-  const nextSheet: CallSheetDoc = {
-    ...sheet,
-    status: input.toStatus,
-  };
 
   if (isFixtureMode()) {
-    const next = await upsertFixtureDocuments([nextSheet, transition]);
-    return { company: next };
+    return recordFixtureMove(transition);
   }
 
   const client = createSanityClient("write");
