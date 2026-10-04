@@ -7,19 +7,19 @@ export function Callboard({ board }: { board: BoardView }) {
 
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-8 sm:px-8 sm:py-12">
-      <p className="no-print mb-6 font-mono text-[0.7rem] uppercase tracking-[0.28em] text-[var(--tungsten)]">
+      <p className="no-print mb-6 font-mono text-[0.7rem] uppercase text-[var(--tungsten)]">
         Stage door · {board.production?.venue ?? "The Salt Stores"}
       </p>
 
       <article className="paper-board relative flex-1 px-6 py-10 sm:px-12 sm:py-14">
         <header className="relative text-center">
-          <p className="font-mono text-[0.72rem] uppercase tracking-[0.42em] text-[var(--ink-soft)]">
+          <p className="font-mono text-[0.72rem] uppercase text-[var(--ink-soft)]">
             {company}
           </p>
-          <h1 className="mt-3 font-display text-[clamp(2.8rem,9vw,6.4rem)] leading-[0.9] tracking-tight">
+          <h1 className="mt-3 font-display text-5xl sm:text-7xl leading-[0.9]">
             {show}
           </h1>
-          <p className="mt-5 font-mono text-[0.78rem] uppercase tracking-[0.28em]">
+          <p className="mt-5 font-mono text-[0.78rem] uppercase">
             {board.isTonight ? "Tonight" : "Called"}
             {board.formattedDate ? ` · ${board.formattedDate}` : ""}
           </p>
@@ -29,6 +29,30 @@ export function Callboard({ board }: { board: BoardView }) {
             </p>
           ) : null}
         </header>
+
+        {board.replacements.length > 0 ? (
+          <section className="call-slip relative mx-auto mt-8 max-w-2xl border-y-2 border-[var(--pin)] bg-[rgba(139,58,42,0.08)] px-4 py-4 text-center">
+            <p className="font-mono text-[0.7rem] uppercase text-[var(--pin)]">
+              Later sheet posted · earlier sheet replaced
+            </p>
+            {board.replacements.map((change) => (
+              <p
+                key={`${change.previousSheetId}-${change.roleName}`}
+                className="mt-2 text-xl leading-tight sm:text-2xl"
+              >
+                {change.roleName}:{" "}
+                <span className="line-through decoration-[var(--pin)]/70">
+                  {change.previousPersonName}
+                </span>{" "}
+                <span className="font-semibold">{change.currentPersonName}</span>
+              </p>
+            ))}
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">
+              {board.replacements[0].previousSheetTitle} is still posted in the
+              book, but the later sheet is the call tonight.
+            </p>
+          </section>
+        ) : null}
 
         <div className="relative mx-auto my-8 h-px w-24 bg-[var(--rule)]" />
 
@@ -45,10 +69,10 @@ export function Callboard({ board }: { board: BoardView }) {
                   {line.callTime}
                 </time>
                 <div>
-                  <p className="text-[clamp(1.7rem,5vw,2.8rem)] leading-none tracking-tight">
+                  <p className="text-3xl sm:text-5xl leading-none">
                     {line.personName}
                   </p>
-                  <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-[var(--ink-soft)]">
+                  <p className="mt-1 font-mono text-xs uppercase text-[var(--ink-soft)]">
                     {line.roleName}
                     {line.note ? ` · ${line.note}` : ""}
                   </p>
@@ -66,7 +90,7 @@ export function Callboard({ board }: { board: BoardView }) {
         </footer>
       </article>
 
-      <nav className="no-print mt-6 flex items-center justify-between font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[var(--rule)]">
+      <nav className="no-print mt-6 flex items-center justify-between font-mono text-[0.68rem] uppercase text-[var(--rule)]">
         <Link href="/backstage" className="hover:text-[var(--tungsten)]">
           Stage manager
         </Link>
@@ -81,7 +105,7 @@ export function Callboard({ board }: { board: BoardView }) {
 function EmptyBoard() {
   return (
     <div className="relative mx-auto max-w-lg py-16 text-center">
-      <p className="text-[clamp(2rem,6vw,3.4rem)] leading-none">
+      <p className="text-4xl sm:text-5xl leading-none">
         No call posted
       </p>
       <p className="mt-4 text-[var(--ink-soft)]">

@@ -16,6 +16,14 @@ export type BoardLine = {
   note?: string;
 };
 
+export type BoardReplacement = {
+  roleName: string;
+  previousPersonName: string;
+  currentPersonName: string;
+  previousSheetTitle: string;
+  previousSheetId: string;
+};
+
 export type BoardView = {
   date: string | null;
   isTonight: boolean;
@@ -23,6 +31,7 @@ export type BoardView = {
   sheet: CallSheetDoc | null;
   production: ProductionDoc | null;
   lines: BoardLine[];
+  replacements: BoardReplacement[];
   emptyReason: "none" | "unposted" | "ok";
 };
 
@@ -45,6 +54,7 @@ export function buildBoardView(
       sheet: null,
       production,
       lines: [],
+      replacements: [],
       emptyReason: "unposted",
     };
   }
@@ -68,6 +78,8 @@ export function buildBoardView(
       return a.personName.localeCompare(b.personName);
     });
 
+  const replacements = buildReplacements(company, sheet);
+
   return {
     date,
     isTonight: date === today,
@@ -75,6 +87,45 @@ export function buildBoardView(
     sheet,
     production,
     lines,
+    replacements,
     emptyReason: "ok",
   };
+}
+
+function buildReplacements(
+  company: Company,
+  sheet: CallSheetDoc,
+): BoardReplacement[] {
+  const previous = sheet.supersedes?._ref
+    ? getDoc<CallSheetDoc>(company, sheet.supersedes._ref)
+    : null;
+  if (!previous) {
+    return [];
+  }
+
+  return sheet.items
+    .map((item) => {
+      const previousItem = previous.items.find(
+        (entry) => entry.role._ref === item.role._ref,
+      );
+      if (!previousItem || previousItem.person._ref === item.person._ref) {
+        return null;
+      }
+
+      const role = getDoc<RoleDoc>(company, item.role._ref);
+      const previousPerson = getDoc<PersonDoc>(
+        company,
+        previousItem.person._ref,
+      );
+      const currentPerson = getDoc<PersonDoc>(company, item.person._ref);
+
+      return {
+        roleName: role?.characterName ?? "Role",
+        previousPersonName: previousPerson?.name ?? "Previous call",
+        currentPersonName: currentPerson?.name ?? "Current call",
+        previousSheetTitle: previous.title ?? previous._id,
+        previousSheetId: previous._id,
+      };
+    })
+    .filter((item): item is BoardReplacement => Boolean(item));
 }

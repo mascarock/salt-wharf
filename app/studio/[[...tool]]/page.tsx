@@ -11,7 +11,7 @@ export default function StudioPage() {
     return (
       <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-4 py-16">
         <article className="paper-board relative p-8">
-          <p className="relative font-mono text-[0.68rem] uppercase tracking-[0.28em] text-[var(--ink-soft)]">
+          <p className="relative font-mono text-[0.68rem] uppercase text-[var(--ink-soft)]">
             Salt Wharf · Studio
           </p>
           <h1 className="relative mt-3 text-4xl leading-none">

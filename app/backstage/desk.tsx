@@ -49,13 +49,21 @@ export function Desk({
     role && date
       ? findCoverage(role, date, company, workingSheet ?? null)
       : [];
+  const postedSheets = date
+    ? company.callSheets
+        .filter(
+          (sheet) =>
+            sheet.performanceDate === date && sheet.status === "posted",
+        )
+        .sort((a, b) => a._id.localeCompare(b._id))
+    : [];
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
+    <div className="callboard-wall mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
       <section className="paper-board relative p-6 sm:p-8">
         <div className="relative flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[0.68rem] uppercase tracking-[0.28em] text-[var(--ink-soft)]">
+            <p className="font-mono text-[0.68rem] uppercase text-[var(--ink-soft)]">
               Backstage · {production?.companyName ?? "Salt Wharf"}
             </p>
             <h1 className="mt-2 text-4xl leading-none sm:text-5xl">
@@ -69,8 +77,10 @@ export function Desk({
           </form>
         </div>
         <p className="relative mt-3 max-w-xl text-sm text-[var(--ink-soft)]">
-          Elena Cassar. The door passphrase is in the book. Moves write a
-          transition document; they do not flip a boolean.
+          Fake stage-door gate for the challenge demo. It does not protect
+          Sanity or GitHub; live writes still require local Sanity environment
+          credentials. Moves write a transition document instead of flipping a
+          boolean.
         </p>
 
         <Separator className="relative my-6" />
@@ -81,6 +91,15 @@ export function Desk({
             (item) =>
               board.sheet && item.callSheet._ref === board.sheet._id,
           )}
+        />
+
+        <Separator className="relative my-6" />
+
+        <PostedSheetStack
+          sheets={postedSheets}
+          standingSheet={board.sheet}
+          people={company.people}
+          roles={company.roles}
         />
 
         <Separator className="relative my-6" />
@@ -103,7 +122,7 @@ export function Desk({
       </section>
 
       <section className="paper-board relative p-6 sm:p-8">
-        <p className="relative font-mono text-[0.68rem] uppercase tracking-[0.28em] text-[var(--ink-soft)]">
+        <p className="relative font-mono text-[0.68rem] uppercase text-[var(--ink-soft)]">
           Cover finder
         </p>
         <h2 className="relative mt-2 text-3xl leading-none">Who can stand in</h2>
@@ -122,7 +141,7 @@ export function Desk({
           date={date}
         />
         {role ? (
-          <p className="relative mt-4 font-mono text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+          <p className="relative mt-4 font-mono text-xs uppercase text-[var(--ink-soft)]">
             {role.characterName} · {formatRange(role.requiredRange)} ·{" "}
             {role.requiredSkills.join(" · ")}
           </p>
@@ -177,8 +196,8 @@ function PostedSummary({
       )}
       {board.sheet?.supersedes ? (
         <p className="mt-3 text-sm text-[var(--ink-soft)]">
-          This sheet supersedes {board.sheet.supersedes._ref}. The older
-          posting still names the principal and still says posted.
+          This sheet supersedes {board.sheet.supersedes._ref}. The older sheet
+          is still posted in the book, but it does not win.
         </p>
       ) : null}
       {transitions.length > 0 ? (
@@ -200,6 +219,105 @@ function PostedSummary({
           Open the public board
         </Link>
       </p>
+    </div>
+  );
+}
+
+function PostedSheetStack({
+  sheets,
+  standingSheet,
+  people,
+  roles,
+}: {
+  sheets: CallSheetDoc[];
+  standingSheet: CallSheetDoc | null;
+  people: PersonDoc[];
+  roles: RoleDoc[];
+}) {
+  if (sheets.length === 0) {
+    return (
+      <div className="relative">
+        <h2 className="text-2xl">Posted sheets</h2>
+        <p className="mt-2 text-sm text-[var(--ink-soft)]">
+          No posted sheet for this night.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="text-2xl">Posted sheets in the book</h2>
+        <Badge>{sheets.length} posted</Badge>
+      </div>
+      <p className="mt-2 text-sm text-[var(--ink-soft)]">
+        Both sheets remain pinned in the book. A posted sheet another posted
+        sheet supersedes stays visible here, but loses at the public door.
+      </p>
+      <div className="mt-4 space-y-4">
+        {sheets.map((sheet) => {
+          const isStanding = standingSheet?._id === sheet._id;
+          const isReplaced = standingSheet?.supersedes?._ref === sheet._id;
+          return (
+            <section
+              key={sheet._id}
+              className="call-slip border-y border-[var(--rule)]/70 px-3 py-3"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <p className="font-mono text-[0.68rem] uppercase text-[var(--ink-soft)]">
+                    {isStanding
+                      ? "On the door now"
+                      : isReplaced
+                        ? "Earlier posting, replaced"
+                        : "Posted"}
+                  </p>
+                  <h3 className="text-xl leading-tight">
+                    {sheet.title ?? sheet._id}
+                  </h3>
+                </div>
+                <Badge>
+                  {isStanding ? "on door" : isReplaced ? "replaced" : "posted"}
+                </Badge>
+              </div>
+              {isReplaced && standingSheet ? (
+                <p className="mt-2 text-sm text-[var(--pin)]">
+                  Still says posted, but {standingSheet.title ?? standingSheet._id}{" "}
+                  supersedes it, so Mara Camilleri does not appear on the door.
+                </p>
+              ) : null}
+              <ul className="mt-3 space-y-1">
+                {sheet.items.map((item) => {
+                  const person = people.find(
+                    (entry) => entry._id === item.person._ref,
+                  );
+                  const role = roles.find(
+                    (entry) => entry._id === item.role._ref,
+                  );
+                  return (
+                    <li
+                      key={item._key}
+                      className="flex justify-between gap-4 border-b border-[var(--rule)]/35 py-1 text-sm"
+                    >
+                      <span>
+                        <span className="font-mono text-[var(--pin)]">
+                          {item.callTime}
+                        </span>{" "}
+                        {person?.name}
+                      </span>
+                      <span className="text-right text-[var(--ink-soft)]">
+                        {role?.characterName}
+                        {item.note ? ` · ${item.note}` : ""}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -266,7 +384,7 @@ function DraftPanel({
         ) : null}
       </div>
 
-      <h3 className="mt-8 font-mono text-xs uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+      <h3 className="mt-8 font-mono text-xs uppercase text-[var(--ink-soft)]">
         Transitions
       </h3>
       {transitions.length === 0 ? (
@@ -308,7 +426,7 @@ function CoverForm({
 }) {
   return (
     <form method="get" className="relative mt-6 grid gap-3 sm:grid-cols-2">
-      <label className="text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+      <label className="text-xs uppercase text-[var(--ink-soft)]">
         Role
         <select
           name="role"
@@ -326,7 +444,7 @@ function CoverForm({
           })}
         </select>
       </label>
-      <label className="text-xs uppercase tracking-[0.14em] text-[var(--ink-soft)]">
+      <label className="text-xs uppercase text-[var(--ink-soft)]">
         Night
         <select
           name="date"
@@ -355,7 +473,7 @@ function CoverageList({ traces }: { traces: CoverTrace[] }) {
   return (
     <div className="relative mt-6 space-y-6">
       <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+        <h3 className="font-mono text-xs uppercase text-[var(--ink-soft)]">
           Can cover
         </h3>
         {yes.length === 0 ? (
@@ -371,7 +489,7 @@ function CoverageList({ traces }: { traces: CoverTrace[] }) {
         )}
       </div>
       <div>
-        <h3 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+        <h3 className="font-mono text-xs uppercase text-[var(--ink-soft)]">
           First reason they cannot
         </h3>
         <ul className="mt-2 space-y-2 text-sm">
@@ -381,7 +499,7 @@ function CoverageList({ traces }: { traces: CoverTrace[] }) {
               className="flex justify-between gap-4 border-b border-[var(--rule)]/40 py-1"
             >
               <span>{trace.personName}</span>
-              <span className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[var(--pin)]">
+              <span className="font-mono text-[0.7rem] uppercase text-[var(--pin)]">
                 {trace.failedPredicate}
               </span>
             </li>

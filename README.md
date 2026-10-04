@@ -1,8 +1,13 @@
 # Salt Wharf
 
-Stage-door callboard for a Valletta theatre company. The public page is the board on the wall: who is actually called tonight. Backstage, a stage manager moves a call sheet through a workflow stored as documents, and asks the book who can cover a role.
+Salt Wharf is a stage-door callboard for a fictional Valletta theatre company. The public page is the paper on the wall: it shows who is actually called tonight. Backstage, the stage manager sees the call-sheet stack, moves sheets through workflow documents, and asks the book who can cover a role.
 
-Coverage is a function of range, skills, concurrent scenes, unavailability, and how many roles a person is already covering. It is not a maintained covers list.
+On 4 October 2026, two posted sheets exist:
+
+1. `callSheet-oct4-v1`, the earlier posting, still names Mara Camilleri as Rosa.
+2. `callSheet-oct4-v2`, the later posting, supersedes the first sheet and posts Lina Borg because Camilleri is off.
+
+The door shows Borg. The earlier sheet is still in the dataset and still says `posted`, but it does not win because a later posted sheet for the same night points at it with `supersedes`.
 
 ## Run
 
@@ -11,77 +16,78 @@ npm install
 npm run dev
 ```
 
-Open [http://127.0.0.1:43173](http://127.0.0.1:43173). No environment variables are required. Fixture mode reads `sanity/seed.ndjson`.
+Open [http://127.0.0.1:43174](http://127.0.0.1:43174). No environment variables are required. With `SANITY_PROJECT_ID` unset, fixture mode reads `sanity/seed.ndjson` and local workflow moves write to `.data/overlay.ndjson`, which is gitignored.
 
 ```bash
+npm run verify
 npm run build
 npm start
 ```
 
-`npm run build` also runs `npm run verify`, which checks the seed story: the later posted sheet wins, and the cover traces for Rosa hold.
+`npm run verify` asserts the 4 October story: v2 is the standing sheet, v1 remains posted, Mara Camilleri is still on the earlier sheet, Lina Borg is on the door, and the cover predicates explain why the other candidates fail.
 
-## Stage door
+## Stage Door
 
-The backstage gate is disclosed, not real authentication.
+The backstage gate is fake stage-door theatre for the challenge demo. It is intentionally disclosed:
 
 - Name: `elena`
 - Passphrase: `callboard`
 
-`/backstage` is the desk. `/` is the door.
+This does not protect Sanity, GitHub, or any real resource. Live Sanity writes require the normal local Sanity environment setup, including a write token. The repo leaves `SANITY_API_READ_TOKEN` and `SANITY_API_WRITE_TOKEN` empty.
 
-## How the supersedes rule works
+`/` is the public door. `/backstage` is the desk. `/studio` mounts Sanity Studio only when fixture mode is off.
 
-A night can have more than one call sheet. The board does not print the newest document, and it does not print every sheet that still says `posted`.
+## Supersedes Rule
 
-It prints the posted sheet for that date that no other **posted** sheet for the same date points at with `supersedes`.
+A night can have more than one posted call sheet. Salt Wharf does not blindly print the newest document, and it does not print every sheet with `status: "posted"`.
 
-In the seed, 4 October 2026 has two posted sheets:
+For a performance date, the public door prints the posted sheet that no other posted sheet for that same date supersedes. If a later sheet returns to draft or is struck, it leaves the posted set and stops hiding the older sheet.
 
-1. `callSheet-oct4-v1` still names Mara Camilleri as Rosa.
-2. `callSheet-oct4-v2` sets `supersedes` to the first sheet and names Lina Borg, because Camilleri is unavailable.
-
-The door shows Borg. The first sheet is still in the dataset, still `posted`, and still wrong if you read it in isolation.
-
-If the later sheet leaves the posted set — returned to draft with a written reason, or struck — it can no longer hide the sheet it replaced.
+That is why 4 October 2026 is interesting: the older sheet is not deleted and not edited away. It still records the first call, but the later Rosa-cover sheet supersedes it and becomes the standing call.
 
 ## Coverage
 
-`lib/coverage.ts` is the only source of truth for who can stand in. For each person it checks, in this order:
+Coverage is computed. It is not a stored understudy list.
 
-1. vocal range contains the role's required range (scientific pitch, e.g. G3–C5)
+`lib/coverage.ts` checks each person against the role and the selected night:
+
+1. vocal range contains the role's required range
 2. skills are a superset of the role's required skills
-3. the person is not cast, and not called, in a scene that `runsConcurrentWith` the role's scene
-4. the person is not on `unavailableDates` for that night
+3. the person is not cast, and not called, in a concurrent scene
+4. the person is not unavailable that night
 5. the person is not already covering two other roles that night
 
-The first failed predicate is what the desk prints.
+The desk prints the first failed predicate for each rejected person. In the seed, Lina Borg clears the checks for Rosa; Mara Camilleri fails because she is unavailable on 4 October 2026.
 
 ## Sanity
 
-Sanity project `ebwymj6z`, dataset `production` (public). Studio lives at `/studio` when `SANITY_PROJECT_ID` is set. With that variable unset, the app stays in fixture mode and `/studio` stays parked.
+Sanity project id: `ebwymj6z`
 
-Copy `.env.example`. The project id and dataset are already filled. Leave the tokens empty unless you need live writes:
+Dataset: `production`
 
-```
+Copy `.env.example` if you want live Sanity mode. Keep the tokens blank in the repo:
+
+```env
 SANITY_PROJECT_ID=ebwymj6z
 SANITY_DATASET=production
 SANITY_API_READ_TOKEN=
 SANITY_API_WRITE_TOKEN=
 ```
 
-Import the same seed the app already uses:
+Import the same seed the fixture app uses:
 
 ```bash
 npx sanity dataset import sanity/seed.ndjson production
 ```
 
-Schema is TypeScript under `sanity/schema`. The desk structure groups call sheets by status and opens a Callboard tool that resolves the standing posted sheet with the same function as the public door.
+Schema lives under `sanity/schema`. The Sanity desk structure groups call sheets by status and exposes a Callboard tool that resolves the same standing posted sheet as the public door.
 
 ## Scripts
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Next.js on port 43173 |
-| `npm run build` | Verify seed, then production build |
-| `npm run verify` | Assert the 4 October cover story |
-| `npm run seed:write` | Rewrite `sanity/seed.ndjson` from `scripts/generate-seed.ts` |
+| `npm run dev` | Runs Next.js on port 43174 |
+| `npm run verify` | Proves the 4 October call-sheet and coverage story |
+| `npm run build` | Verifies the seed, then builds the Next app |
+| `npm run start` | Starts the built app on port 43174 |
+| `npm run seed:write` | Rewrites `sanity/seed.ndjson` from `scripts/generate-seed.ts` |

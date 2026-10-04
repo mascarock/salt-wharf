@@ -3,6 +3,7 @@ import { indexCompany } from "../lib/company";
 import { findCoverage } from "../lib/coverage";
 import { parseNdjson } from "../lib/parse-ndjson";
 import { currentPostedCallSheet } from "../lib/posted-call";
+import { buildBoardView } from "../lib/board";
 import type { CallSheetDoc, PersonDoc, RoleDoc } from "../lib/types";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -48,7 +49,36 @@ async function main() {
   const lina = company.byId.get("person-linaBorg") as PersonDoc;
   assert.ok(lina.skills.includes("high-belt"));
 
-  console.log("Seed story holds: Borg is called, Camilleri is not.");
+  const board = buildBoardView(company, date);
+  assert.deepEqual(
+    board.replacements.map((replacement) => ({
+      roleName: replacement.roleName,
+      previousPersonName: replacement.previousPersonName,
+      currentPersonName: replacement.currentPersonName,
+    })),
+    [
+      {
+        roleName: "Rosa",
+        previousPersonName: "Mara Camilleri",
+        currentPersonName: "Lina Borg",
+      },
+    ],
+  );
+
+  assert.ok(
+    board.lines.some(
+      (line) => line.roleName === "Rosa" && line.personName === "Lina Borg",
+    ),
+    "public door shows Borg as Rosa",
+  );
+  assert.ok(
+    !board.lines.some((line) => line.personName === "Mara Camilleri"),
+    "public door does not show Camilleri after v2 posts",
+  );
+
+  console.log(
+    "Seed story holds: v1 still names Mara Camilleri; v2 supersedes it; the public door calls Lina Borg.",
+  );
 }
 
 main().catch((error) => {

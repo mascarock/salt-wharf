@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 43173",
-    "build": "tsx scripts/verify-seed.ts && next build",
-    "start": "next start --port 43173",
+    "dev": "next dev --webpack --port 43174",
+    "build": "tsx scripts/verify-seed.ts && next build --webpack",
+    "start": "next start --port 43174",
     "lint": "eslint",
     "verify": "tsx scripts/verify-seed.ts",
     "seed:write": "tsx scripts/generate-seed.ts"

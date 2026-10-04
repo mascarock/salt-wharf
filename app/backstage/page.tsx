@@ -16,15 +16,16 @@ export default async function BackstagePage({
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-4 py-16">
         <article className="paper-board relative p-8">
-          <p className="relative font-mono text-[0.68rem] uppercase tracking-[0.28em] text-[var(--ink-soft)]">
+          <p className="relative font-mono text-[0.68rem] uppercase text-[var(--ink-soft)]">
             Salt Wharf · Stage door
           </p>
           <h1 className="relative mt-3 text-4xl leading-none">
             The book is shut
           </h1>
           <p className="relative mt-4 text-sm text-[var(--ink-soft)]">
-            Disclosed gate, not real security. Stage manager name{" "}
-            <strong>elena</strong>, passphrase <strong>callboard</strong>.
+            Fake stage-door gate for the challenge demo, not real security for
+            Sanity or GitHub. Stage manager name <strong>elena</strong>,
+            passphrase <strong>callboard</strong>.
           </p>
           <div className="relative mt-8">
             <GateForm />
