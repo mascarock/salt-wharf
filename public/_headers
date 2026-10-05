@@ -1,0 +1,31 @@
+# Workers static assets. Next.js headers() does not apply here.
+# https://developers.cloudflare.com/workers/static-assets/headers/
+# https://opennext.js.org/cloudflare/caching
+#
+# X-Content-Type-Options: nosniff is set on this zone. If an asset is stored
+# without a MIME type, browsers refuse the file. That drops styles when a
+# build emits CSS at /_next/static/chunks/*.css (Turbopack) as well as
+# /_next/static/css/*.css (webpack). Pin the type from the extension.
+# The first matching rule replaces the uploaded Content-Type; it does not
+# append a second one.
+
+/*.css
+  Content-Type: text/css; charset=utf-8
+
+/*.js
+  Content-Type: application/javascript; charset=utf-8
+
+/*.mjs
+  Content-Type: application/javascript; charset=utf-8
+
+/*.woff2
+  Content-Type: font/woff2
+
+/*.woff
+  Content-Type: font/woff
+
+/*.svg
+  Content-Type: image/svg+xml
+
+/*.ico
+  Content-Type: image/x-icon
